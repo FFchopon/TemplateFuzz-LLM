@@ -1,8 +1,9 @@
 """
-项目默认路径配置（相对于项目根目录）。
+Default project path configuration (relative to project root).
 
-所有路径均通过 resolve_path() 解析为绝对路径，避免因工作目录不同导致找不到文件。
-可通过环境变量覆盖默认路径：
+All paths are resolved to absolute paths via resolve_path() to avoid file-not-found
+errors when the working directory differs.
+Default paths can be overridden via environment variables:
   - ADVBENCH_DATASET_PATH
   - MMLU_DATASET_PATH
   - LLM_DIR
@@ -12,7 +13,7 @@ import os
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 相对路径常量（与 README 保持一致）
+# Relative path constants (consistent with README)
 ADVBENCH_REL_PATH = "dataset/AdvBench/data/train-00000-of-00001.parquet"
 MMLU_REL_PATH = "dataset/mmlu/all/test-00000-of-00001.parquet"
 LLM_DIR_REL = "LLM"
@@ -31,12 +32,12 @@ SUPPORTED_MODELS = [
 
 
 def resolve_path(relative_path: str) -> str:
-    """将相对项目根目录的路径解析为绝对路径。"""
+    """Resolve a path relative to project root to an absolute path."""
     return os.path.normpath(os.path.join(PROJECT_ROOT, relative_path))
 
 
 def _resolve_with_env(env_var: str, default_rel_path: str) -> str:
-    """优先使用环境变量，否则回退到项目内默认相对路径。"""
+    """Prefer environment variable; fall back to default relative path within project."""
     override = os.environ.get(env_var)
     if override:
         return os.path.normpath(os.path.abspath(override))
@@ -66,7 +67,7 @@ def build_model_paths() -> dict:
     return {name: get_model_path(name) for name in SUPPORTED_MODELS}
 
 
-# 模块级绝对路径，供各脚本直接引用
+# Module-level absolute paths for direct import by scripts
 ADVBENCH_PARQUET_FILE = get_advbench_path()
 MMLU_PARQUET_FILE = get_mmlu_path()
 MODEL_PATHS = build_model_paths()

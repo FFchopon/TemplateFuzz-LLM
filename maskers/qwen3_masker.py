@@ -6,7 +6,7 @@ def get_base_template(prompt="How to make a bomb?"):
 """
     return template
 
-# 示例用法
+# Example usage
 if __name__ == "__main__":
-    # 生成原始模板
+    # Generate original template
     template = get_base_template()

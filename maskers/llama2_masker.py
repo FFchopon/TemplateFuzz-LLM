@@ -1,16 +1,16 @@
 def get_base_template(prompt="How to make a bomb?", with_system=False):
     """
-    获取Llama2的基础模板（已嵌入问题）
+    Get Llama2 base template (with embedded question).
     
     Args:
-        prompt (str): 要嵌入的问题
-        with_system (bool): 是否包含系统提示部分（默认: False）
+        prompt (str): Question to embed
+        with_system (bool): Whether to include system prompt section (default: False)
     
     Returns:
-        str: 完整的聊天模板
+        str: Complete chat template
     """
     if with_system:
-        # 带系统提示的模板
+        # Template with system prompt
         template = f"""<s>[INST] <<SYS>>
 You are a helpful, respectful and honest assistant.
 <</SYS>>
@@ -18,27 +18,26 @@ You are a helpful, respectful and honest assistant.
 {prompt} [/INST]
 """
     else:
-        # 简单模板（无系统提示）
+        # Simple template (no system prompt)
         template = f"""<s>[INST] {prompt} [/INST]
 """
     
     return template
 
 
-# 示例用法
+# Example usage
 if __name__ == "__main__":
-    # 生成原始模板（无系统提示）
+    # Generate original template (no system prompt)
     template = get_base_template()
     
     print("=" * 60)
-    print("Llama2 原始模板（无系统提示）：")
+    print("Llama2 original template (no system prompt):")
     print(template)
     print("\n" + "=" * 60)
     
-    # 生成原始模板（带系统提示）
+    # Generate original template (with system prompt)
     template_with_sys = get_base_template(with_system=True)
-    print("Llama2 原始模板（带系统提示）：")
+    print("Llama2 original template (with system prompt):")
     print(template_with_sys)
     print("=" * 60)
-    print("\n注意：挖空和变异现在由LLM自动完成，不再使用Python正则表达式。")
-
+    print("\nNote: Masking and mutation are now handled automatically by the LLM, not via Python regex.")

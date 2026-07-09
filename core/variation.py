@@ -3,11 +3,11 @@ import numpy as np
 import logging
 import uuid
 
-# 移除固定随机种子，改为动态设置
-# 随机种子将在需要时通过函数参数或环境变量设置
+# Fixed random seed removed; seed is set dynamically instead
+# Random seed is configured via function arguments or environment variables when needed
 
 class RandomSeedManager:
-    """随机种子管理器，用于统一管理variation模块的随机种子"""
+    """Random seed manager for unified seed control in the variation module."""
     
     _instance = None
     _seed = None
@@ -21,9 +21,9 @@ class RandomSeedManager:
     @classmethod
     def set_seed(cls, seed: int = None):
         """
-        设置随机种子
+        Set random seed.
         Args:
-            seed: 随机种子值，如果为None则使用时间戳生成
+            seed: Seed value; if None, generated from timestamp
         """
         if seed is None:
             import time
@@ -32,76 +32,76 @@ class RandomSeedManager:
         cls._seed = seed
         cls._is_initialized = True
         
-        # 设置所有相关的随机种子
+        # Set all related random seeds
         random.seed(seed)
         np.random.seed(seed)
         
-        logging.info(f"🎲 Variation模块随机种子已设置为: {seed}")
+        logging.info(f"🎲 Variation module random seed set to: {seed}")
         return seed
     
     @classmethod
     def get_seed(cls):
-        """获取当前随机种子"""
+        """Get current random seed."""
         if not cls._is_initialized:
-            return cls.set_seed()  # 如果未初始化，自动设置
+            return cls.set_seed()  # Auto-initialize if not yet set
         return cls._seed
     
     @classmethod
     def reset_seed(cls):
-        """重置随机种子（使用新的时间戳）"""
+        """Reset random seed (using a new timestamp)."""
         return cls.set_seed()
     
     @classmethod
     def is_initialized(cls):
-        """检查是否已初始化随机种子"""
+        """Check whether random seed has been initialized."""
         return cls._is_initialized
 
 class VariationConfig:
-    """变异配置，定义变异结构和互斥关系
+    """Variation configuration defining structure and mutual exclusion.
     
-    新的变异类别结构：
-    V1 (System Message Mutation): 系统消息变异
-    V2 (User/Assistant Message Mutation): 用户/助手消息变异  
-    V3 (Role Marker Mutation): 角色标记变异 (合并原V3+V4)
-    V4_1 (Delimiter Mutation 1): 分隔符变异1 (原V5)
-    V4_2 (Delimiter Mutation 2): 分隔符变异2 (原V6_1-V6_3)
-    V4_3 (Delimiter Mutation 3): 分隔符变异3 (原V6_4-V6_6)
-    V4_4 (Delimiter Mutation 4): 分隔符变异4 (原V6_7-V6_9)
-    V5 (Remove generation hint): 移除生成提示 (原V7+V8)
+    New variation category structure:
+    V1 (System Message Mutation): System message mutation
+    V2 (User/Assistant Message Mutation): User/assistant message mutation
+    V3 (Role Marker Mutation): Role marker mutation (merged former V3+V4)
+    V4_1 (Delimiter Mutation 1): Delimiter mutation 1 (former V5)
+    V4_2 (Delimiter Mutation 2): Delimiter mutation 2 (former V6_1-V6_3)
+    V4_3 (Delimiter Mutation 3): Delimiter mutation 3 (former V6_4-V6_6)
+    V4_4 (Delimiter Mutation 4): Delimiter mutation 4 (former V6_7-V6_9)
+    V5 (Remove generation hint): Remove generation hint (former V7+V8)
     """
     def __init__(self):
-        # 新的变异映射：从新变异名到原变异名
+        # New variation mapping: new name -> old name
         self.new_to_old_mapping = {
-            # V1 保持不变
+            # V1 unchanged
             "V1_1": "V1_1", "V1_2": "V1_2", "V1_3": "V1_3", "V1_4": "V1_4", "V1_5": "V1_5", "V1_6": "V1_6",
-            # V2 保持不变  
+            # V2 unchanged
             "V2_1": "V2_1", "V2_2": "V2_2", "V2_3": "V2_3", "V2_4": "V2_4", "V2_5": "V2_5",
-            # V3 合并原V3和V4
+            # V3 merges former V3 and V4
             "V3_1": "V3_1", "V3_2": "V3_2", "V3_3": "V3_3", "V3_4": "V3_4",
             "V3_5": "V4_1", "V3_6": "V4_2", "V3_7": "V4_3", "V3_8": "V4_4", "V3_9": "V4_5", "V3_10": "V4_6",
             "V3_11": "V4_7", "V3_12": "V4_8", "V3_13": "V4_9", "V3_14": "V4_10", "V3_15": "V4_11", "V3_16": "V4_12",
             "V3_17": "V4_13", "V3_18": "V4_14", "V3_19": "V4_15", "V3_20": "V4_16",
-            # V4_1 对应原V5
+            # V4_1 maps to former V5
             "V4_1_1": "V5_1", "V4_1_2": "V5_2", "V4_1_3": "V5_3", "V4_1_4": "V5_4", "V4_1_5": "V5_5", "V4_1_6": "V5_6", "V4_1_7": "V5_7",
-            # V4_2 对应原V6_1-V6_3
+            # V4_2 maps to former V6_1-V6_3
             "V4_2_1": "V6_1", "V4_2_2": "V6_2", "V4_2_3": "V6_3",
-            # V4_3 对应原V6_4-V6_6
+            # V4_3 maps to former V6_4-V6_6
             "V4_3_1": "V6_4", "V4_3_2": "V6_5", "V4_3_3": "V6_6",
-            # V4_4 对应原V6_7-V6_9
+            # V4_4 maps to former V6_7-V6_9
             "V4_4_1": "V6_7", "V4_4_2": "V6_8", "V4_4_3": "V6_9",
-            # V5 合并原V7和V8
+            # V5 merges former V7 and V8
             "V5_1": "V7_1", "V5_2": "V7_2", "V5_3": "V7_3",
             "V5_4": "V8_1", "V5_5": "V8_2", "V5_6": "V8_3", "V5_7": "V8_4", "V5_8": "V8_5",
             "V5_9": "V8_6", "V5_10": "V8_7", "V5_11": "V8_8", "V5_12": "V8_9", "V5_13": "V8_10"
         }
         
-        # 反向映射：从原变异名到新变异名
+        # Reverse mapping: old name -> new name
         self.old_to_new_mapping = {v: k for k, v in self.new_to_old_mapping.items()}
         
-        # 新的冲突组定义
+        # New conflict group definitions
         self.conflict_groups = {
-            # 大类之间不互斥，只有各大类内部的小类互斥
-            "V1": ["V1_2", "V1_3", "V1_4", "V1_5", "V1_6"],  # V1_1是默认，不参与互斥
+            # Major classes are not mutually exclusive; only minor variants within each class conflict
+            "V1": ["V1_2", "V1_3", "V1_4", "V1_5", "V1_6"],  # V1_1 is default, not in conflict group
             "V2": ["V2_1", "V2_2", "V2_3", "V2_4", "V2_5"],
             "V3": ["V3_1", "V3_2", "V3_3", "V3_4", "V3_5", "V3_6", "V3_7", "V3_8", "V3_9", "V3_10", 
                    "V3_11", "V3_12", "V3_13", "V3_14", "V3_15", "V3_16", "V3_17", "V3_18", "V3_19", "V3_20"],
@@ -111,12 +111,12 @@ class VariationConfig:
             "V4_4": ["V4_4_1", "V4_4_2", "V4_4_3"],
             "V5": ["V5_1", "V5_2", "V5_3", "V5_4", "V5_5", "V5_6", "V5_7", "V5_8", "V5_9", "V5_10", "V5_11", "V5_12", "V5_13"],
             
-            # V4的特殊互斥关系：V4_1与V4_2,V4_3,V4_4互斥，但V4_2,V4_3,V4_4之间不互斥
+            # V4 special conflict: V4_1 conflicts with V4_2/V4_3/V4_4, but V4_2/V4_3/V4_4 do not conflict with each other
             "V4_DELIMITER_CONFLICT": ["V4_1_1", "V4_1_2", "V4_1_3", "V4_1_4", "V4_1_5", "V4_1_6", "V4_1_7",
                                      "V4_2_1", "V4_2_2", "V4_2_3", "V4_3_1", "V4_3_2", "V4_3_3", "V4_4_1", "V4_4_2", "V4_4_3"]
         }
         
-        # 新的类别配置
+        # New class configuration
         self.class_config = {
             "V1": {0: [], 1: ["V1_1"], 2: ["V1_2"], 3: ["V1_3"], 4: ["V1_4"], 5: ["V1_5"], 6: ["V1_6"]},
             "V2": {0: [], 1: ["V2_1"], 2: ["V2_2"], 3: ["V2_3"], 4: ["V2_4"], 5: ["V2_5"]},
@@ -140,35 +140,35 @@ class VariationConfig:
         for group, variants in self.conflict_groups.items():
             for variant in variants:
                 if variant not in self.variant_to_class:
-                    logging.warning(f"变异 {variant} 在 conflict_groups 中，但在 class_config 中未定义")
+                    logging.warning(f"Variant {variant} is in conflict_groups but not defined in class_config")
 
 class VariationProbabilityManager:
-    """管理大类和小类变异概率"""
+    """Manages major and minor class variation probabilities."""
     def __init__(self, config: VariationConfig):
         self.config = config
         
-        # 确保随机种子已初始化
+        # Ensure random seed is initialized
         if not RandomSeedManager.is_initialized():
             RandomSeedManager.set_seed()
-            logging.debug("VariationProbabilityManager: 自动初始化随机种子")
-        # Initialize 8 major class probabilities (新的分组结构)
+            logging.debug("VariationProbabilityManager: auto-initialized random seed")
+        # Initialize 8 major class probabilities (new grouping structure)
         self.major_probs = {
             "V1": 1/8, "V2": 1/8, "V3": 1/8, "V4_1": 1/8, "V4_2": 1/8, "V4_3": 1/8, "V4_4": 1/8, "V5": 1/8
         }
         self.minor_probs = {}
         for class_name in config.class_config:
             variants = [v for idx, v in config.class_config[class_name].items() if idx != 0]
-            # 直接使用新的变异名，不需要映射
+            # Use new variant names directly; no mapping needed
             class_variants = {}
             for v in variants:
-                variant_name = v[0]  # 获取变异名
+                variant_name = v[0]  # Get variant name
                 class_variants[variant_name] = 1/len(variants)
             self.minor_probs[class_name] = class_variants
-        logging.debug("初始化变异概率: 大类=%s, 小类=%s", self.major_probs, self.minor_probs)
+        logging.debug("Initialized variation probabilities: major=%s, minor=%s", self.major_probs, self.minor_probs)
 
     def initialize_probabilities(self, scores: dict):
-        """根据初始实验分数初始化概率"""
-        logging.info("开始初始化变异概率")
+        """Initialize probabilities from initial experiment scores."""
+        logging.info("Initializing variation probabilities")
         # Compute major class average scores
         major_scores = {class_name: 0 for class_name in self.major_probs}
         major_counts = {class_name: 0 for class_name in self.major_probs}
@@ -177,7 +177,7 @@ class VariationProbabilityManager:
             if class_name:
                 major_scores[class_name] += score
                 major_counts[class_name] += 1
-                logging.debug("变异 %s (大类 %s) 分数: %.4f", variant, class_name, score)
+                logging.debug("Variant %s (class %s) score: %.4f", variant, class_name, score)
         # Set major class probabilities
         raw_probs = {}
         total_raw = 0
@@ -196,21 +196,21 @@ class VariationProbabilityManager:
         # Normalize again
         for class_name in self.major_probs:
             self.major_probs[class_name] = round(self.major_probs[class_name] / total_prob, 2)
-        logging.info("大类概率: %s", self.major_probs)
+        logging.info("Major class probabilities: %s", self.major_probs)
         # Set minor class probabilities
         for class_name in self.minor_probs:
             variants = self.minor_probs[class_name]
             num_variants = len(variants)
             for variant in variants:
                 variants[variant] = round(1 / num_variants, 2)
-            logging.info("小类概率 (%s): %s", class_name, variants)
+            logging.info("Minor class probabilities (%s): %s", class_name, variants)
 
     def update_probabilities(self, parent_variants: list, new_variant: str, old_score: float, new_score: float, seed_pool_scores: list = None, learning_rate: float = 2):
-        """根据变异效果动态调整概率"""
-        logging.debug("更新概率: 父变异=%s, 新变异=%s, 旧分数=%.4f, 新分数=%.4f", parent_variants, new_variant, old_score, new_score)
+        """Dynamically adjust probabilities based on variation effectiveness."""
+        logging.debug("Updating probabilities: parent_variants=%s, new_variant=%s, old_score=%.4f, new_score=%.4f", parent_variants, new_variant, old_score, new_score)
         # Compute dynamic baseline score
         BASELINE_SCORE = min(seed_pool_scores) if seed_pool_scores else 0.5840
-        logging.debug("动态基准分数: %.4f", BASELINE_SCORE)
+        logging.debug("Dynamic baseline score: %.4f", BASELINE_SCORE)
     
         # Compute change ratios
         parent_change = (new_score - old_score) / max(old_score, 1e-6)
@@ -218,12 +218,12 @@ class VariationProbabilityManager:
         if new_score > old_score:
             adjustment = 1 + learning_rate * baseline_change + learning_rate * parent_change
             adjustment = min(max(adjustment, 1.0), 2.0)
-            logging.debug("分数提升，调整因子=%.2f", adjustment)
+            logging.debug("Score improved, adjustment factor=%.2f", adjustment)
             variants_to_update = parent_variants + [new_variant] if new_score > BASELINE_SCORE else [new_variant]
         else:
             adjustment = 1 - learning_rate * abs(parent_change)
             adjustment = min(max(adjustment, 0.5), 1.0)
-            logging.debug("分数下降，调整因子=%.2f", adjustment)
+            logging.debug("Score decreased, adjustment factor=%.2f", adjustment)
             variants_to_update = [new_variant]
 
         # Update major and minor probabilities
@@ -239,7 +239,7 @@ class VariationProbabilityManager:
                     self.major_probs[k] = round(self.major_probs[k] * total_prob / new_total, 2)
                 # Update minor probabilities
                 variants = self.minor_probs[class_name]
-                # 直接使用新的变异名
+                # Use new variant names directly
                 if variant in variants:
                     total_prob = sum(variants.values())
                     variants[variant] *= adjustment
@@ -247,45 +247,45 @@ class VariationProbabilityManager:
                     for k in variants:
                         variants[k] = round(variants[k] * total_prob / new_total, 2)
                 else:
-                    logging.warning(f"变异 {variant} 在 minor_probs[{class_name}] 中未找到")
+                    logging.warning(f"Variant {variant} not found in minor_probs[{class_name}]")
                 updated_classes.add(class_name)
 
     def select_variation(self, seed_classes: list = None) -> str:
-        """根据概率选择一个变异"""
+        """Select a variation based on probabilities."""
         classes = list(self.major_probs.keys())
         probs = [self.major_probs[c] for c in classes]
         if seed_classes:
             classes = [c for c in classes if c in seed_classes]
             probs = [self.major_probs[c] for c in classes]
             if not classes:
-                logging.warning("没有可用的种子大类: %s", seed_classes)
+                logging.warning("No available seed classes: %s", seed_classes)
                 return None
         class_name = np.random.choice(classes, p=np.array(probs) / sum(probs))
         variants = list(self.minor_probs[class_name].keys())
         probs = [self.minor_probs[class_name][v] for v in variants]
         selected_variant = np.random.choice(variants, p=np.array(probs) / sum(probs))
         
-        logging.debug("选择变异: 大类=%s, 选中变异=%s", class_name, selected_variant)
+        logging.debug("Selected variation: class=%s, variant=%s", class_name, selected_variant)
         return selected_variant
     
     def set_random_seed(self, seed: int = None):
         """
-        为概率管理器设置随机种子
+        Set random seed for probability manager.
         Args:
-            seed: 随机种子值，如果为None则使用时间戳生成
+            seed: Seed value; if None, generated from timestamp
         Returns:
-            实际使用的随机种子值
+            Actual seed value used
         """
         actual_seed = RandomSeedManager.set_seed(seed)
-        logging.info(f"🎲 VariationProbabilityManager: 随机种子已设置为 {actual_seed}")
+        logging.info(f"🎲 VariationProbabilityManager: random seed set to {actual_seed}")
         return actual_seed
     
     def get_current_seed(self):
-        """获取当前使用的随机种子"""
+        """Get current random seed."""
         return RandomSeedManager.get_seed()
 
 def check_v4_conflicts(variants, config):
-    """检查V4的特殊冲突关系：V4_1与V4_2,V4_3,V4_4互斥"""
+    """Check V4 special conflicts: V4_1 is mutually exclusive with V4_2/V4_3/V4_4."""
     v4_1_variants = [v for v in variants if v in config.conflict_groups.get("V4_1", [])]
     v4_234_variants = []
     for v in variants:
@@ -294,14 +294,14 @@ def check_v4_conflicts(variants, config):
             v in config.conflict_groups.get("V4_4", [])):
             v4_234_variants.append(v)
     
-    # 如果V4_1和V4_2/V4_3/V4_4同时存在，则有冲突
+    # Conflict if V4_1 and V4_2/V4_3/V4_4 coexist
     return len(v4_1_variants) > 0 and len(v4_234_variants) > 0
 
 def generate_random_template(max_variations, config, prob_manager: VariationProbabilityManager, seed_classes=None, parent_variants=None):
-    # 确保随机种子已初始化
+    # Ensure random seed is initialized
     if not RandomSeedManager.is_initialized():
         RandomSeedManager.set_seed()
-        logging.debug("generate_random_template: 自动初始化随机种子")
+        logging.debug("generate_random_template: auto-initialized random seed")
     
     selected_variants = []
     group_variants = {group: [] for group in config.conflict_groups}
@@ -345,7 +345,7 @@ def generate_random_template(max_variations, config, prob_manager: VariationProb
     for variant in all_variants:
         class_name = config.variant_to_class[variant]
         class_counts[class_name] = class_counts.get(class_name, 0) + 1
-    # 新的结构中，各大类之间不冲突，只需检查大类内部冲突
+    # In new structure, major classes do not conflict; only check intra-class conflicts
     conflict_classes = [c for c, count in class_counts.items() if count > 1]
     conflict_groups = []
     for group, group_variants in config.conflict_groups.items():
@@ -353,32 +353,32 @@ def generate_random_template(max_variations, config, prob_manager: VariationProb
         if group_count > 1:
             conflict_groups.append((group, [v for v in all_variants if v in group_variants]))
     
-    # 检查V4的特殊冲突
+    # Check V4 special conflicts
     v4_conflict = check_v4_conflicts(all_variants, config)
     
     if conflict_classes or conflict_groups or v4_conflict:
         return {class_name: [] for class_name in config.class_config}, []
 
     def variant_to_class_index(variant, class_name):
-        """将变异名转换为对应类别的索引"""
-        # 处理新的命名规则
+        """Convert variant name to corresponding class index."""
+        # Handle new naming rules
         parts = variant.split("_")
         if len(parts) == 2:
-            # V1_1, V2_1 等格式
+            # V1_1, V2_1, etc.
             variant_idx = int(parts[1])
             return variant_idx
         elif len(parts) == 3:
-            # V4_1_1, V4_2_1 等格式  
+            # V4_1_1, V4_2_1, etc.
             variant_idx = int(parts[2])
             return variant_idx
         else:
-            # 其他情况，尝试从最后一个部分提取索引
+            # Other cases: try to extract index from last part
             try:
                 variant_idx = int(parts[-1])
                 return variant_idx
             except ValueError:
-                logging.warning(f"无法解析变异索引: {variant}")
-                return 1  # 默认返回1
+                logging.warning(f"Unable to parse variant index: {variant}")
+                return 1  # Default to 1
 
     template = {class_name: [] for class_name in config.class_config}
     for variant in selected_variants:
@@ -389,33 +389,33 @@ def generate_random_template(max_variations, config, prob_manager: VariationProb
     return template, selected_variants
 
 class RandomMutationGenerator:
-    """完全随机变异组合生成器"""
+    """Fully random variation combination generator."""
     def __init__(self, config: 'VariationConfig'):
         self.config = config
-        self.used_combinations = set()  # 记录已使用的变异组合
+        self.used_combinations = set()  # Track used variation combinations
         
-        # 确保随机种子已初始化
+        # Ensure random seed is initialized
         if not RandomSeedManager.is_initialized():
             RandomSeedManager.set_seed()
-            logging.debug("RandomMutationGenerator: 自动初始化随机种子")
+            logging.debug("RandomMutationGenerator: auto-initialized random seed")
         
     def generate_random_combination(self, max_variations: int) -> tuple:
         """
-        生成完全随机的变异组合
-        改进逻辑：
-        1. 使用指定的大类选择概率：
-           V1: 1/8, V2: 1/8, V3: 1/8, V4: 1/8, V5: 1/16, 
+        Generate a fully random variation combination.
+        Improved logic:
+        1. Use specified major class selection probabilities:
+           V1: 1/8, V2: 1/8, V3: 1/8, V4: 1/8, V5: 1/16,
            V6_BOS: 1/16, V6_BOT: 1/16, V6_ROLE: 1/16, V7: 1/8, V8: 1/8
-        2. 大类内所有小类概率相等
+        2. All minor variants within a class have equal probability
         
         Args:
-            max_variations: 最大变异叠加数
+            max_variations: Maximum number of stacked variations
         Returns:
-            (template_dict, variants_list) 或 (None, None) 如果无法生成有效组合
+            (template_dict, variants_list) or (None, None) if no valid combination can be generated
         """
-        max_attempts = 1000  # 最大尝试次数，避免无限循环
+        max_attempts = 1000  # Max attempts to avoid infinite loop
         
-        # 定义大类选择概率（新的分组结构）
+        # Major class selection probabilities (new grouping structure)
         class_probabilities = {
             "V1": 1/8,
             "V2": 1/8, 
@@ -428,25 +428,25 @@ class RandomMutationGenerator:
         }
         
         for attempt in range(max_attempts):
-            # 获取所有可用的大类
+            # Get all available major classes
             available_classes = list(self.config.class_config.keys())
             
             if not available_classes:
-                logging.warning("🎲 随机变异模式：没有可用的大类")
+                logging.warning("🎲 Random mutation mode: no available major classes")
                 return None, None
             
-            # 随机选择变异数量（1到max_variations之间）
+            # Randomly select number of variations (1 to max_variations)
             num_variations = random.randint(1, max_variations)
             
-            # 新的选择逻辑：先选大类，再选小类
+            # New selection logic: select major class first, then minor variant
             selected_variants = []
             selected_classes = set()
             
-            # 用于跟踪冲突组中已选择的变异
+            # Track selected variants per conflict group
             conflict_group_selections = {group: [] for group in self.config.conflict_groups}
             
             for _ in range(num_variations):
-                # 第一步：获取可选择的大类（排除已选择的和冲突的）
+                # Step 1: Get selectable major classes (exclude already selected and conflicting ones)
                 available_classes_for_selection = []
                 available_probabilities = []
                 
@@ -454,26 +454,26 @@ class RandomMutationGenerator:
                     if class_name in selected_classes:
                         continue
                     
-                    # 检查该大类是否有可用的变异（排除冲突）
+                    # Check if class has available variants (excluding conflicts)
                     class_has_available_variants = False
                     for idx, variant_list in self.config.class_config[class_name].items():
-                        if idx == 0 or not variant_list:  # 跳过无变异选项
+                        if idx == 0 or not variant_list:  # Skip no-variation option
                             continue
                         
-                        variant = variant_list[0]  # 获取变异名
+                        variant = variant_list[0]  # Get variant name
                         
-                        # 检查互斥关系
+                        # Check mutual exclusion
                         can_select = True
                         for group, group_variants in self.config.conflict_groups.items():
                             if variant in group_variants:
-                                # 检查该冲突组是否已有选择
+                                # Check if conflict group already has a selection
                                 if conflict_group_selections[group]:
                                     can_select = False
                                     break
                         
-                        # 检查V4的特殊冲突关系
+                        # Check V4 special conflicts
                         if can_select:
-                            # 构造临时变异列表进行V4冲突检查
+                            # Build temporary variant list for V4 conflict check
                             temp_variants = selected_variants + [variant]
                             if check_v4_conflicts(temp_variants, self.config):
                                 can_select = False
@@ -484,42 +484,42 @@ class RandomMutationGenerator:
                     
                     if class_has_available_variants:
                         available_classes_for_selection.append(class_name)
-                        # 获取该大类的概率，如果没有定义则使用默认值
+                        # Get class probability, or use default
                         prob = class_probabilities.get(class_name, 1/16)
                         available_probabilities.append(prob)
                 
                 if not available_classes_for_selection:
                     break
                 
-                # 第二步：根据指定概率选择一个大类
-                # 归一化概率
+                # Step 2: Select a major class by specified probability
+                # Normalize probabilities
                 total_prob = sum(available_probabilities)
                 normalized_probs = [p / total_prob for p in available_probabilities]
                 
-                # 使用概率权重选择大类
+                # Weighted random selection of major class
                 selected_class = random.choices(available_classes_for_selection, weights=normalized_probs)[0]
-                logging.debug(f"🎲 按概率选择大类: {selected_class} (概率: {class_probabilities.get(selected_class, 1/16):.4f})")
+                logging.debug(f"🎲 Selected major class by probability: {selected_class} (prob: {class_probabilities.get(selected_class, 1/16):.4f})")
                 
-                # 第三步：在选中的大类内，等概率选择一个小类变异
+                # Step 3: Within selected class, equally likely minor variant selection
                 available_variants_in_class = []
                 for idx, variant_list in self.config.class_config[selected_class].items():
-                    if idx == 0 or not variant_list:  # 跳过无变异选项
+                    if idx == 0 or not variant_list:  # Skip no-variation option
                         continue
                     
-                    variant = variant_list[0]  # 获取变异名
+                    variant = variant_list[0]  # Get variant name
                     
-                    # 检查互斥关系
+                    # Check mutual exclusion
                     can_select = True
                     for group, group_variants in self.config.conflict_groups.items():
                         if variant in group_variants:
-                            # 检查该冲突组是否已有选择
+                            # Check if conflict group already has a selection
                             if conflict_group_selections[group]:
                                 can_select = False
                                 break
                     
-                    # 检查V4的特殊冲突关系
+                    # Check V4 special conflicts
                     if can_select:
-                        # 构造临时变异列表进行V4冲突检查
+                        # Build temporary variant list for V4 conflict check
                         temp_variants = selected_variants + [variant]
                         if check_v4_conflicts(temp_variants, self.config):
                             can_select = False
@@ -530,14 +530,14 @@ class RandomMutationGenerator:
                 if not available_variants_in_class:
                     continue
                 
-                # 在大类内等概率随机选择一个小类变异
+                # Equally likely random minor variant within class
                 selected_variant = random.choice(available_variants_in_class)
-                logging.debug(f"🎲 在大类 {selected_class} 中随机选择小类: {selected_variant}")
+                logging.debug(f"🎲 Randomly selected minor variant in class {selected_class}: {selected_variant}")
                 
                 selected_variants.append(selected_variant)
                 selected_classes.add(selected_class)
                 
-                # 更新冲突组选择
+                # Update conflict group selections
                 for group, group_variants in self.config.conflict_groups.items():
                     if selected_variant in group_variants:
                         conflict_group_selections[group].append(selected_variant)
@@ -545,49 +545,49 @@ class RandomMutationGenerator:
             if not selected_variants:
                 continue
             
-            # 生成组合签名用于去重
+            # Generate combination signature for deduplication
             combination_signature = tuple(sorted(selected_variants))
             
-            # 检查是否重复
+            # Check for duplicates
             if combination_signature in self.used_combinations:
                 continue
             
-            # 记录已使用的组合
+            # Record used combination
             self.used_combinations.add(combination_signature)
             
-            # 转换为模板格式
+            # Convert to template format
             template = self._variants_to_template(selected_variants)
             
-            logging.info(f"🎲 随机变异模式：生成新组合 (尝试 {attempt + 1}): {selected_variants}")
-            logging.debug(f"🎲 选择过程: 大类按指定概率选择 -> 大类内小类概率相等")
-            logging.debug(f"🎲 大类概率: V1/V2/V3/V4/V7=1/8, V5/V6_BOS/V6_BOT/V6_ROLE/V8_PROMPT/V8_SEP=1/16")
+            logging.info(f"🎲 Random mutation mode: generated new combination (attempt {attempt + 1}): {selected_variants}")
+            logging.debug(f"🎲 Selection process: major class by specified probability -> equal minor class probability")
+            logging.debug(f"🎲 Major class probabilities: V1/V2/V3/V4/V7=1/8, V5/V6_BOS/V6_BOT/V6_ROLE/V8_PROMPT/V8_SEP=1/16")
             return template, selected_variants
         
-        logging.warning(f"🎲 随机变异模式：经过 {max_attempts} 次尝试，无法生成新的随机变异组合")
+        logging.warning(f"🎲 Random mutation mode: failed to generate new random combination after {max_attempts} attempts")
         return None, None
     
     def _variants_to_template(self, variants: list) -> dict:
-        """将变异列表转换为模板字典格式"""
+        """Convert variant list to template dictionary format."""
         def variant_to_class_index(variant, class_name):
-            """将变异名转换为对应类别的索引"""
-            # 处理新的命名规则
+            """Convert variant name to corresponding class index."""
+            # Handle new naming rules
             parts = variant.split("_")
             if len(parts) == 2:
-                # V1_1, V2_1 等格式
+                # V1_1, V2_1, etc.
                 variant_idx = int(parts[1])
                 return variant_idx
             elif len(parts) == 3:
-                # V4_1_1, V4_2_1 等格式  
+                # V4_1_1, V4_2_1, etc.
                 variant_idx = int(parts[2])
                 return variant_idx
             else:
-                # 其他情况，尝试从最后一个部分提取索引
+                # Other cases: try to extract index from last part
                 try:
                     variant_idx = int(parts[-1])
                     return variant_idx
                 except ValueError:
-                    logging.warning(f"无法解析变异索引: {variant}")
-                    return 1  # 默认返回1
+                    logging.warning(f"Unable to parse variant index: {variant}")
+                    return 1  # Default to 1
         
         template = {class_name: [] for class_name in self.config.class_config}
         for variant in variants:
@@ -598,57 +598,57 @@ class RandomMutationGenerator:
         return template
     
     def reset_used_combinations(self):
-        """重置已使用的组合记录"""
+        """Reset used combination records."""
         self.used_combinations.clear()
-        logging.info("🎲 随机变异模式：已重置变异组合记录")
+        logging.info("🎲 Random mutation mode: reset variation combination records")
     
     def get_used_combinations_count(self) -> int:
-        """获取已使用的组合数量"""
+        """Get count of used combinations."""
         return len(self.used_combinations)
     
     def set_random_seed(self, seed: int = None):
         """
-        为当前生成器设置随机种子
+        Set random seed for current generator.
         Args:
-            seed: 随机种子值，如果为None则使用时间戳生成
+            seed: Seed value; if None, generated from timestamp
         Returns:
-            实际使用的随机种子值
+            Actual seed value used
         """
         actual_seed = RandomSeedManager.set_seed(seed)
-        logging.info(f"🎲 RandomMutationGenerator: 随机种子已设置为 {actual_seed}")
+        logging.info(f"🎲 RandomMutationGenerator: random seed set to {actual_seed}")
         return actual_seed
     
     def get_current_seed(self):
-        """获取当前使用的随机种子"""
+        """Get current random seed."""
         return RandomSeedManager.get_seed()
     
     def reset_with_new_seed(self):
-        """使用新的随机种子重置生成器，并清空已使用的组合记录"""
+        """Reset generator with new random seed and clear used combination records."""
         new_seed = RandomSeedManager.reset_seed()
         self.used_combinations.clear()
-        logging.info(f"🎲 RandomMutationGenerator: 已使用新种子 {new_seed} 重置，清空组合记录")
+        logging.info(f"🎲 RandomMutationGenerator: reset with new seed {new_seed}, cleared combination records")
         return new_seed
 
 
-# 便利函数，用于外部直接调用
+# Convenience functions for external callers
 def set_variation_random_seed(seed: int = None):
     """
-    设置variation模块的随机种子
+    Set random seed for variation module.
     Args:
-        seed: 随机种子值，如果为None则使用时间戳生成
+        seed: Seed value; if None, generated from timestamp
     Returns:
-        实际使用的随机种子值
+        Actual seed value used
     """
     return RandomSeedManager.set_seed(seed)
 
 def get_variation_random_seed():
-    """获取当前variation模块的随机种子"""
+    """Get current random seed for variation module."""
     return RandomSeedManager.get_seed()
 
 def reset_variation_random_seed():
-    """重置variation模块的随机种子（使用新的时间戳）"""
+    """Reset random seed for variation module (using new timestamp)."""
     return RandomSeedManager.reset_seed()
 
 def is_variation_seed_initialized():
-    """检查variation模块的随机种子是否已初始化"""
+    """Check whether variation module random seed has been initialized."""
     return RandomSeedManager.is_initialized()

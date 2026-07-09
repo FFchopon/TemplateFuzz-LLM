@@ -4,8 +4,6 @@ TemplateFuzz is a utility-aware chat template fuzzing framework for jailbreak te
 
 > **Research Use Only**: This project is intended for AI safety research and red-teaming. Do not use these techniques for any illegal or harmful purposes.
 
-![TemplateFuzz Overview](figure/overview.png)
-
 ---
 
 ## 1. Environment Setup
@@ -56,13 +54,7 @@ All default paths are managed centrally in `core/paths.py` (resolved to absolute
 
 ### 2.2 Pipeline
 
-```mermaid
-flowchart LR
-    A[Original Chat Template] --> B[Mask]
-    B --> C[LLM Mutate]
-    C --> D[Attack Target Model]
-    D --> E[Evaluate ASR]
-```
+![TemplateFuzz Overview](figure/overview.png)
 
 ### 2.3 Attack Mode
 

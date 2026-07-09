@@ -1,6 +1,6 @@
 """
-Maskers模块
-提供各种模型的模板挖空功能
+Maskers module.
+Provides template masking functionality for various models.
 """
 
 from . import llama3_masker
@@ -16,4 +16,3 @@ __all__ = [
     'gpt_masker',
     'SeedPool',
 ]
-

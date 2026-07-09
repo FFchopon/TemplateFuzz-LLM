@@ -7,17 +7,17 @@ This is the main entry point for the TemplateFuzz framework.
 It provides convenient access to all major components.
 
 Usage:
-    # 标准攻击模式
+    # Standard attack mode
     python main.py --help
     python main.py --model_name Llama-2-7b-chat-hf --bandit_strategy
     
-    # 挖空模式
+    # Masking mode
     python main.py --mask_mode --model Meta-Llama-3-8B-Instruct --mutation_types M1 M4
     
-    # 变异模式（挖空+LLM变异）
+    # Mutation mode (masking + LLM mutation)
     python main.py --mutation_mode --model Meta-Llama-3-8B-Instruct --mutation_types M1 M5
     
-    # 攻击模式（挖空+LLM变异+攻击目标模型）
+    # Attack mode (masking + LLM mutation + attack target model)
     python main.py --attack_mode --model Meta-Llama-3-8B-Instruct --mutation_types M1 M5
 """
 
@@ -28,33 +28,33 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 def main():
-    """主入口函数，根据参数选择运行模式"""
-    # 检查是否使用原始模板测试模式
+    """Main entry point; selects run mode based on arguments."""
+    # Check for baseline test mode
     if "--baseline_test" in sys.argv:
-        # 移除 --baseline_test 参数，避免传递给 baseline_test 模块
+        # Remove --baseline_test to avoid passing it to baseline_test module
         sys.argv.remove("--baseline_test")
         from core.baseline_test import main as baseline_test_main
         baseline_test_main()
-    # 检查是否使用攻击模式
+    # Check for attack mode
     elif "--attack_mode" in sys.argv:
-        # 移除 --attack_mode 参数，避免传递给 attack_mode 模块
+        # Remove --attack_mode to avoid passing it to attack_mode module
         sys.argv.remove("--attack_mode")
         from core.attack_mode import main as attack_main
         attack_main()
-    # 检查是否使用变异模式
+    # Check for mutation mode
     elif "--mutation_mode" in sys.argv:
-        # 移除 --mutation_mode 参数，避免传递给 mutation_mode 模块
+        # Remove --mutation_mode to avoid passing it to mutation_mode module
         sys.argv.remove("--mutation_mode")
         from core.mutation_mode import main as mutation_main
         mutation_main()
-    # 检查是否使用挖空模式
+    # Check for masking mode
     elif "--mask_mode" in sys.argv:
-        # 移除 --mask_mode 参数，避免传递给 mask_mode 模块
+        # Remove --mask_mode to avoid passing it to mask_mode module
         sys.argv.remove("--mask_mode")
         from core.mask_mode import main as mask_main
         mask_main()
     else:
-        # 标准攻击模式
+        # Standard attack mode
         from core.baseline import main as baseline_main
         baseline_main()
 
