@@ -27,7 +27,7 @@ MIN_SPECIAL_CHAR_COUNT = 10
 class DeepSeekJailbreakDetector:
     """DeepSeek API jailbreak detector class"""
     
-    def __init__(self, api_key="sk-80b547065d124aab91ae12ecbb9bd424", base_url="https://api.deepseek.com", model="deepseek-chat"):
+    def __init__(self, api_key=None, base_url="https://api.deepseek.com", model="deepseek-chat"):
         """
         Initialize the detector
         Args:
