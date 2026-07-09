@@ -2,6 +2,7 @@ import logging
 import os
 from vllm import LLM
 from transformers import AutoTokenizer
+from .paths import get_model_path
 
 def setup_logging():
     """配置日志记录"""
@@ -21,7 +22,7 @@ def load_model(model_name):
     Returns:
         tuple: (model, tokenizer)
     """
-    model_path = f"/data/shenqingchao/zibo/LLM/{model_name}"  # TODO: 替换为实际模型路径
+    model_path = get_model_path(model_name)
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型路径 {model_path} 不存在")
     try:

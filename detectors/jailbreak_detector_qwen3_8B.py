@@ -9,22 +9,26 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import pandas as pd
 import os
+import sys
 from tqdm import tqdm
 import warnings
 import gc
 import re
 warnings.filterwarnings("ignore")
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from core.paths import get_model_path
+
 class JailbreakDetector:
     """越狱检测器类 - 使用Qwen3-8B模型"""
     
-    def __init__(self, model_name="/data/shenqingchao/zibo/LLM/Qwen3-8B"):
+    def __init__(self, model_name=None):
         """
         初始化检测器
         Args:
-            model_name: 模型名称
+            model_name: 模型路径，默认使用项目 LLM/Qwen3-8B
         """
-        self.model_name = model_name
+        self.model_name = model_name or get_model_path("Qwen3-8B")
         self.model = None
         self.tokenizer = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

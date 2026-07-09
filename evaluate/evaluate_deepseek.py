@@ -6,6 +6,11 @@ import logging
 import random
 import numpy as np
 import torch
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from core.paths import ADVBENCH_PARQUET_FILE, MMLU_PARQUET_FILE
 
 def convert_to_serializable(obj):
     """将对象转换为可JSON序列化的格式"""
@@ -21,9 +26,9 @@ def convert_to_serializable(obj):
         return {key: convert_to_serializable(value) for key, value in obj.items()}
     return obj
 
-# 数据集路径（需替换为实际路径）
-PARQUET_FILE = "/data/shenqingchao/zibo/dataset/AdvBench/data/train-00000-of-00001.parquet"
-MMLU_FILE = "/data/shenqingchao/zibo/dataset/mmlu/all/test-00000-of-00001.parquet"
+# 数据集路径（统一由 core.paths 管理）
+PARQUET_FILE = ADVBENCH_PARQUET_FILE
+MMLU_FILE = MMLU_PARQUET_FILE
 
 # Few-shot 示例（从 accuracy_mmlu_llama3.py）
 FEW_SHOT_EXAMPLES = [

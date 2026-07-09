@@ -22,9 +22,7 @@ from maskers import llama3_masker, llama2_masker, gpt_masker, gpt4_masker, qwen3
 from maskers.seed_pool import SeedPool
 from mutators import LLMMutator
 from core.gpt_api_wrapper import load_gpt4_model
-
-# AdvBench数据集路径
-ADVBENCH_PARQUET_FILE = "/data/shenqingchao/zibo/dataset/AdvBench/data/train-00000-of-00001.parquet"
+from core.paths import ADVBENCH_PARQUET_FILE, MODEL_PATHS
 
 # 越狱判断参数（从evaluate_llama3.py）
 MAX_WORD_COUNT = 600
@@ -213,20 +211,6 @@ class MutationBandit:
                   f"平均ASR={avg_reward:6.2f}%")
         
         print("=" * 70)
-
-
-# 模型路径映射
-MODEL_PATHS = {
-    "Meta-Llama-3-8B-Instruct": "/data/shenqingchao/zibo/LLM/Meta-Llama-3-8B-Instruct",
-    "Meta-Llama-3-70B-Instruct": "/data/shenqingchao/zibo/LLM/Meta-Llama-3-70B-Instruct",
-    "Llama-2-7b-chat-hf": "/data/shenqingchao/zibo/LLM/Llama-2-7b-chat-hf",
-    "Qwen2.5-14B-Instruct": "/data/shenqingchao/zibo/LLM/Qwen2.5-14B-Instruct",
-    "Qwen3-8B": "/data/shenqingchao/zibo/LLM/Qwen3-8B",
-    "deepseek-llm-7b-chat": "/data/shenqingchao/zibo/LLM/deepseek-llm-7b-chat",
-    "gpt-oss-20b": "/data/shenqingchao/zibo/LLM/gpt-oss-20b",
-    "gemma-3-4b-it": "/data/shenqingchao/zibo/LLM/gemma-3-4b-it",
-    "gemma-3-27b-it": "/data/shenqingchao/zibo/LLM/gemma-3-27b-it",
-}
 
 
 def load_advbench_questions(sample_size=None):

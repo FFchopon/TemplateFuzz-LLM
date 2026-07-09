@@ -9,6 +9,10 @@ from openai import OpenAI
 import argparse
 import time
 import random
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from core.paths import ADVBENCH_PARQUET_FILE
 
 def convert_to_serializable(obj):
     """将对象转换为可JSON序列化的格式"""
@@ -24,8 +28,8 @@ def convert_to_serializable(obj):
         return {key: convert_to_serializable(value) for key, value in obj.items()}
     return obj
 
-# 数据集路径
-PARQUET_FILE = "/data/shenqingchao/zibo/dataset/AdvBench/data/train-00000-of-00001.parquet"
+# 数据集路径（统一由 core.paths 管理）
+PARQUET_FILE = ADVBENCH_PARQUET_FILE
 
 # Qwen 越狱检测参数
 QWEN_JAILBREAK_MIN_WORD_COUNT = 50

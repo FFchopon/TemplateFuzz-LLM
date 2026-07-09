@@ -12,11 +12,9 @@ import matplotlib
 matplotlib.use('Agg')  # 使用非交互式后端，避免GUI依赖
 from .variation import VariationConfig, VariationProbabilityManager, generate_random_template, RandomMutationGenerator
 from .utils import load_model, setup_logging
+from .paths import ADVBENCH_PARQUET_FILE
 import coloredlogs
 from datetime import datetime
-
-# AdvBench数据集路径
-ADVBENCH_PARQUET_FILE = "/data/shenqingchao/zibo/dataset/AdvBench/data/train-00000-of-00001.parquet"
 
 def sample_advbench_questions(n_questions=50, seed=42):
     """从AdvBench数据集中采样固定的N个问题"""
